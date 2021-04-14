@@ -1,0 +1,48 @@
+@startuml
+
+hide methods
+hide circle
+skinparam shadowing false
+
+title Graph
+
+entity "users" as users {
+    id int
+    name varchar
+    gender varchar
+    age int
+    created_at datetime
+    updated_at datetime
+}
+
+entity "profiles" as profiles {
+    id int
+    bio varchar
+    hobby varchar
+    user_id int
+    created_at datetime
+    updated_at datetime
+}
+
+entity "posts" as posts {
+    id int
+    title varchar
+    body text
+    user_id int // author
+    created_at datetime
+    updated_at datetime
+}
+
+entity "tags" as tags {
+    id int
+    tag varchar
+}
+
+users --> profiles : profile
+profiles --> users : user
+users --> posts : posts
+posts --> users : author
+posts --> tags : tags
+tags --> posts : posts
+
+@enduml
