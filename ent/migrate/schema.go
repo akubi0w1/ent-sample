@@ -8,11 +8,71 @@ import (
 )
 
 var (
+	// PostsColumns holds the columns for the "posts" table.
+	PostsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "body", Type: field.TypeString},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_posts", Type: field.TypeInt, Nullable: true},
+	}
+	// PostsTable holds the schema information for the "posts" table.
+	PostsTable = &schema.Table{
+		Name:       "posts",
+		Columns:    PostsColumns,
+		PrimaryKey: []*schema.Column{PostsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "posts_users_posts",
+				Columns:    []*schema.Column{PostsColumns[5]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// ProfilesColumns holds the columns for the "profiles" table.
+	ProfilesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "gender", Type: field.TypeEnum, Enums: []string{"male", "female", "other"}, Default: "male"},
+		{Name: "age", Type: field.TypeInt},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_profile", Type: field.TypeInt, Unique: true, Nullable: true},
+	}
+	// ProfilesTable holds the schema information for the "profiles" table.
+	ProfilesTable = &schema.Table{
+		Name:       "profiles",
+		Columns:    ProfilesColumns,
+		PrimaryKey: []*schema.Column{ProfilesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "profiles_users_profile",
+				Columns:    []*schema.Column{ProfilesColumns[6]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// TagsColumns holds the columns for the "tags" table.
+	TagsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "tag", Type: field.TypeString, Unique: true},
+	}
+	// TagsTable holds the schema information for the "tags" table.
+	TagsTable = &schema.Table{
+		Name:        "tags",
+		Columns:     TagsColumns,
+		PrimaryKey:  []*schema.Column{TagsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "age", Type: field.TypeInt},
-		{Name: "name", Type: field.TypeString, Default: "unknown"},
+		{Name: "account_id", Type: field.TypeString, Unique: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -21,11 +81,44 @@ var (
 		PrimaryKey:  []*schema.Column{UsersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
+	// PostTagsColumns holds the columns for the "post_tags" table.
+	PostTagsColumns = []*schema.Column{
+		{Name: "post_id", Type: field.TypeInt},
+		{Name: "tag_id", Type: field.TypeInt},
+	}
+	// PostTagsTable holds the schema information for the "post_tags" table.
+	PostTagsTable = &schema.Table{
+		Name:       "post_tags",
+		Columns:    PostTagsColumns,
+		PrimaryKey: []*schema.Column{PostTagsColumns[0], PostTagsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "post_tags_post_id",
+				Columns:    []*schema.Column{PostTagsColumns[0]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "post_tags_tag_id",
+				Columns:    []*schema.Column{PostTagsColumns[1]},
+				RefColumns: []*schema.Column{TagsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		PostsTable,
+		ProfilesTable,
+		TagsTable,
 		UsersTable,
+		PostTagsTable,
 	}
 )
 
 func init() {
+	PostsTable.ForeignKeys[0].RefTable = UsersTable
+	ProfilesTable.ForeignKeys[0].RefTable = UsersTable
+	PostTagsTable.ForeignKeys[0].RefTable = PostsTable
+	PostTagsTable.ForeignKeys[1].RefTable = TagsTable
 }

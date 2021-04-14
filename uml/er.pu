@@ -1,0 +1,44 @@
+@startuml
+
+hide methods
+hide circle
+skinparam shadowing false
+
+title ER
+
+entity "users" as users {
+    id int
+    account_id varchar
+    created_at datetime
+    updated_at datetime
+}
+
+entity "profiles" as profiles {
+    id int
+    name varchar
+    gender varchar
+    age int
+    user_id int
+    created_at datetime
+    updated_at datetime
+}
+
+entity "posts" as posts {
+    id int
+    title varchar
+    body text
+    user_id int // author
+    created_at datetime
+    updated_at datetime
+}
+
+entity "tags" as tags {
+    id int
+    tag varchar
+}
+
+users ||--|| profiles
+users ||--o{ posts
+posts }o--o{ tags
+
+@enduml
