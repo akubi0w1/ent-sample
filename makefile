@@ -1,6 +1,9 @@
 help: ## display help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-24s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
+generate: ## generate code from schema
+	go generate ./ent
+
 dev-up: ## up develop env
 	docker-compose up -d
 

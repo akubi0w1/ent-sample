@@ -1,58 +1,34 @@
-# やったこと
+# ent-sample
 
-code generatorのDL。entも一緒に落ちてきます。
+## overview
 
-```
+[entgo.io/ent](https://github.com/ent/ent)をさわってみた。
+触ってみた所感は[ブログ](https://akubi0w1.tumblr.com/post/648453540863410176/ent%E3%82%92%E8%A7%A6%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F%E6%89%80%E6%84%9F)に書きました。
+
+## how to start
+
+```shell
+# get ent
 $ go get entgo.io/ent/cmd/ent
+
+# generate code
+$ make generate
+
+# DBなどの環境を起動
+$ make dev-up
 ```
 
-コードを生成してみる。
+## やったこと
 
-```
-$ ent init User
-```
+- entのDL
+- スキーマ定義
+    - code generate
+- edge定義
 
-targetを変えてみよう
+以下な感じのDBを作成した。
 
-```
-$ ent init --target mysql/ent/schema User
-```
+![er](./img/er.png)
 
-generaterが作られなかったwので、これはw
+edgeの貼り方参考
 
-スキーマを定義して。。...
-
-generate
-
-```
-$ go generate ./ent
-```
-
-`./ent`の部分は、entディレクトリ以下にある、generate.goのあるディレクトリを刺す
-
-基本編集するのはschemaディレクトリのみ?
-
-main.goにてマイグレーションしてます
-
-memo: schemaのIDは勝手にbigintでつくらしい
-
-
-## reference
-
-edge toだけでやったらどんなテーブルができる？
--> toは一応つくっぽい
-Fromが必要なのは、postsからauthorを編集するなどの関数が作られない？
-
-n:nをつくったらどうなる?
--> users_nicesってテーブルができるっぽい。この際、中間テーブルにidはなく、user_id, post_idのみが存在する。複合キーになっているのか...?
--> 複合キーになっているっぽおおい。
-
-to, fromどっちに外部キーがつくのか？
--> fromにつくっぽい
-
-一つのノードに同じ名前のedgeを持たせることはできないらしい
-
-fromの決め方。
-1:n -> 1=to, n=from
-n:n -> どちらでも構わない
-1:1 -> 外部キーを持たせたいnodeをfromにする
+![graph](./img/graph.png)
